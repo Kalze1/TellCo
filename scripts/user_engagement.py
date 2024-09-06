@@ -6,23 +6,31 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 
-# 1. Aggregate user engagement metrics
+#  Aggregate user engagement metrics
 def aggregate_engagement_metrics(df):
-    """
-    Aggregates the following metrics per user (MSISDN):
-    - Number of sessions
-    - Total session duration
-    - Total session traffic (DL + UL)
-    """
-    user_metrics = df.groupby('MSISDN').agg(
-        session_count=('Bearer Id', 'count'),  # Frequency of sessions
-        total_duration=('Dur. (ms)', 'sum'),   # Total session duration
-        total_traffic=('Total DL (Bytes)', 'sum') + df['Total UL (Bytes)'],  # Total traffic (DL + UL)
-    ).reset_index()
+    # Ensure 'Total DL (Bytes)' and 'Total UL (Bytes)' are numeric
+    df['Total DL (Bytes)'] = pd.to_numeric(df['Total DL (Bytes)'], errors='coerce')
+    df['Total UL (Bytes)'] = pd.to_numeric(df['Total UL (Bytes)'], errors='coerce')
+    
+    # Use the correct column name if 'MSISDN' is different, e.g., 'MSISDN/Number'
+    if 'MSISDN/Number' in df.columns:
+        user_metrics = df.groupby('MSISDN/Number').agg(
+            session_count=('Bearer Id', 'count'),  # Frequency of sessions
+            total_duration=('Dur. (ms)', 'sum'),   # Total session duration
+            total_traffic_dl=('Total DL (Bytes)', 'sum'),  # Total download traffic
+            total_traffic_ul=('Total UL (Bytes)', 'sum')   # Total upload traffic
+        ).reset_index()
+        
+        # Sum download and upload traffic to get total traffic per user
+        user_metrics['total_traffic'] = user_metrics['total_traffic_dl'] + user_metrics['total_traffic_ul']
+    else:
+        raise KeyError("The column 'MSISDN' or 'MSISDN/Number' is missing from the dataset.")
     
     return user_metrics
 
-# 2. Normalize engagement metrics and apply k-means clustering
+
+
+# Normalize engagement metrics and apply k-means clustering
 def normalize_and_cluster(df, k=3):
     """
     Normalizes the engagement metrics and applies k-means clustering.
@@ -37,7 +45,7 @@ def normalize_and_cluster(df, k=3):
     
     return df, kmeans
 
-# 3. Compute statistics for each cluster
+#  Compute statistics for each cluster
 def compute_cluster_stats(df):
     """
     Computes the min, max, average, and total metrics for each cluster.
@@ -61,43 +69,44 @@ def compute_cluster_stats(df):
     
     return cluster_stats
 
-# 4. Aggregate traffic per application
+# Aggregate traffic per application
 def aggregate_traffic_per_app(df):
     """
-    Aggregates user traffic per application and reports the top 10 most engaged users.
+    Aggregates total traffic per application across all users.
     """
     apps = ['Social Media DL (Bytes)', 'Google DL (Bytes)', 'Youtube DL (Bytes)',
             'Netflix DL (Bytes)', 'Gaming DL (Bytes)', 'Other DL (Bytes)']
     
-    # Sum traffic per application for each user
-    app_traffic = df.groupby('MSISDN').agg({app: 'sum' for app in apps}).reset_index()
+    # Sum traffic per application for all users
+    app_traffic = df[apps].sum().reset_index()
+    app_traffic.columns = ['Application', 'Total Traffic (Bytes)']
     
-    # Find top 10 most engaged users per application
-    top_10_users_per_app = {app: app_traffic.nlargest(10, app)[['MSISDN', app]] for app in apps}
-    
-    return top_10_users_per_app
+    return app_traffic
 
-# 5. Plot top 3 most used applications
+
+# Plot top 3 most used applications
 def plot_top_3_apps(app_traffic):
     """
     Plots the top 3 most used applications by traffic.
     """
-    # Sum traffic for all users per application
-    total_traffic_per_app = app_traffic[['Social Media DL (Bytes)', 'Google DL (Bytes)', 'Youtube DL (Bytes)',
-                                         'Netflix DL (Bytes)', 'Gaming DL (Bytes)', 'Other DL (Bytes)']].sum()
+    # Ensure 'app_traffic' is a DataFrame
+    if not isinstance(app_traffic, pd.DataFrame):
+        raise TypeError("Expected a DataFrame for 'app_traffic', but got something else.")
     
-    # Sort and get the top 3 apps
-    top_3_apps = total_traffic_per_app.sort_values(ascending=False).head(3)
+    # Sort by 'Total Traffic (Bytes)' and get the top 3 applications
+    top_3_apps = app_traffic.sort_values(by='Total Traffic (Bytes)', ascending=False).head(3)
     
-    # Plot
+    # Plot the top 3 apps
     plt.figure(figsize=(8, 6))
-    sns.barplot(x=top_3_apps.index, y=top_3_apps.values)
+    sns.barplot(x='Application', y='Total Traffic (Bytes)', data=top_3_apps)
     plt.title('Top 3 Most Used Applications by Traffic')
     plt.xlabel('Application')
     plt.ylabel('Total Traffic (Bytes)')
     plt.show()
 
-# 6. Use the elbow method to find the optimal k
+
+
+#  Use the elbow method to find the optimal k
 def elbow_method(df):
     """
     Uses the elbow method to find the optimal number of clusters (k).
@@ -124,7 +133,7 @@ def elbow_method(df):
     # Return optimal k based on visual inspection of the elbow plot
     return inertia
 
-# 7. Evaluate cluster quality with silhouette score
+#  Evaluate cluster quality with silhouette score
 def silhouette_analysis(df, k):
     """
     Compute and return the silhouette score for k clusters.

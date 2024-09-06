@@ -39,44 +39,51 @@ def load_and_inspect_data(df):
     print(df.describe(include='all'))
     return df
 
-# Function to handle missing values and outliers
-def handle_missing_and_outliers(df):
-    # Fill missing values with the mean for numeric columns
-    df.fillna(df.mean(), inplace=True)
-    
-    # Handle outliers using z-score method
-    numeric_cols = df.select_dtypes(include=[np.number]).columns
-    df[numeric_cols] = df[numeric_cols].apply(lambda x: np.where(zscore(x) > 3, x.mean(), x))
-    
-    return df
 
 # Function to segment users into decile classes based on total session duration
 def segment_users_by_duration(df):
+    # Calculate total session duration and total data
     df['Total_Session_Duration'] = df['Dur. (ms)']
     df['Total_Data'] = df['Total DL (Bytes)'] + df['Total UL (Bytes)']
     
     # Segment users into decile classes based on session duration
-    df['Decile_Class'] = pd.qcut(df['Total_Session_Duration'], 10, labels=False)
+    df['Decile_Class'] = pd.qcut(df['Total_Session_Duration'], 10, labels=False, duplicates='drop')
     
     # Compute total data per decile class
     decile_data = df.groupby('Decile_Class')['Total_Data'].sum().sort_values(ascending=False)
+    
     return df, decile_data
+
 
 # Function to compute basic metrics for quantitative variables
 def compute_basic_metrics(df):
-    mean_values = df.mean()
-    median_values = df.median()
-    std_dev = df.std()
+    # List of columns that should be numeric
+    numeric_columns = [
+        'Dur. (ms)', 'Total DL (Bytes)', 'Total UL (Bytes)',
+        'Social Media DL (Bytes)', 'Social Media UL (Bytes)',
+        'Google DL (Bytes)', 'Google UL (Bytes)', 'Youtube DL (Bytes)', 'Youtube UL (Bytes)',
+        'Netflix DL (Bytes)', 'Netflix UL (Bytes)', 'Gaming DL (Bytes)', 'Gaming UL (Bytes)',
+        'Other DL (Bytes)', 'Other UL (Bytes)'
+    ]
     
+    # Convert columns to numeric, forcing errors to NaN
+    df[numeric_columns] = df[numeric_columns].apply(pd.to_numeric, errors='coerce')
+    
+    # Now compute mean, median, std_dev
+    mean_values = df[numeric_columns].mean()
+    median_values = df[numeric_columns].median()
+    std_dev = df[numeric_columns].std()
+
     print("Mean Values:\n", mean_values)
     print("Median Values:\n", median_values)
     print("Standard Deviation:\n", std_dev)
 
     # Dispersion parameters
-    dispersion_params = df.describe().T[['mean', 'std', 'min', '25%', '50%', '75%', 'max']]
+    dispersion_params = df[numeric_columns].describe().T[['mean', 'std', 'min', '25%', '50%', '75%', 'max']]
     print(dispersion_params)
     
     return mean_values, median_values, std_dev, dispersion_params
+
 
 # Function to perform graphical univariate analysis
 def univariate_analysis(df, variable):

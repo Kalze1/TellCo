@@ -3,5 +3,9 @@ numpy
 matplotlib
 seaborn
 scipy
-sklearn
 psycopg2
+scikit-learn
+pytest
+mlflow
+mysql-connector-python
+sqlalchemy

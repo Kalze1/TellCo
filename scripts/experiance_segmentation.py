@@ -147,3 +147,68 @@ def perform_kmeans_clustering(df, k=3):
     return cluster_descriptions, cluster_counts
 
 
+
+import pandas as pd
+
+def compute_satisfaction_score(df):
+    """Compute the satisfaction score as the average of engagement and experience scores, then report top 10 satisfied customers."""
+    
+    # Calculate the satisfaction score
+    df['Satisfaction Score'] = df[['Engagement Score', 'Experience Score']].mean(axis=1)
+    
+    # Sort customers by satisfaction score in ascending order (since lower scores indicate higher satisfaction)
+    top_satisfied_customers = df.sort_values(by='Satisfaction Score').head(10)
+    
+    return top_satisfied_customers[['MSISDN/Number', 'Satisfaction Score']]
+
+
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+def build_regression_model(df, features, target):
+    """Build and evaluate a regression model to predict the satisfaction score."""
+    
+    # Selecting features and target variable
+    X = df[features]
+    y = df[target]
+    
+    # Split the data into training and testing sets (80% train, 20% test)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    
+    # Initialize and train the regression model (Linear Regression in this case)
+    model = LinearRegression()
+    model.fit(X_train, y_train)
+    
+    # Predict on the test set
+    y_pred = model.predict(X_test)
+    
+    # Evaluate the model
+    mse = mean_squared_error(y_test, y_pred)
+    r2 = r2_score(y_test, y_pred)
+    
+    # Plotting the predicted vs actual satisfaction scores
+    plt.figure(figsize=(10, 6))
+    sns.scatterplot(x=y_test, y=y_pred)
+    plt.title('Predicted vs Actual Satisfaction Scores')
+    plt.xlabel('Actual Satisfaction Score')
+    plt.ylabel('Predicted Satisfaction Score')
+    plt.show()
+    
+    # Returning the model and evaluation metrics
+    return model, mse, r2
+
+# Example usage:
+# features = ['Engagement Score', 'Experience Score']  # Add any additional relevant features if needed
+# target = 'Satisfaction Score'
+# model, mse, r2 = build_regression_model(df, features, target)
+
+# To view the results:
+# print(f"Mean Squared Error: {mse}")
+# print(f"R-squared: {r2}")
+
+

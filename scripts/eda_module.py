@@ -101,6 +101,7 @@ def univariate_analysis(df, variable):
 
 # Function to perform bivariate analysis
 def bivariate_analysis(df, app_columns):
+    df, decliced_data =segment_users_by_duration(df)
     for app in app_columns:
         plt.figure(figsize=(8, 5))
         sns.scatterplot(x=df[app], y=df['Total_Data'])

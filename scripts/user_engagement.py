@@ -32,6 +32,7 @@ def aggregate_engagement_metrics(df):
 
 # Normalize engagement metrics and apply k-means clustering
 def normalize_and_cluster(df, k=3):
+    
     """
     Normalizes the engagement metrics and applies k-means clustering.
     """
@@ -103,6 +104,8 @@ def plot_top_3_apps(app_traffic):
     plt.xlabel('Application')
     plt.ylabel('Total Traffic (Bytes)')
     plt.show()
+
+    return top_3_apps
 
 
 

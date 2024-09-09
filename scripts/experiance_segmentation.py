@@ -1,4 +1,8 @@
+from statistics import LinearRegression
 import pandas as pd
+from sklearn.base import r2_score
+from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
@@ -148,7 +152,6 @@ def perform_kmeans_clustering(df, k=3):
 
 
 
-import pandas as pd
 
 def compute_satisfaction_score(df):
     """Compute the satisfaction score as the average of engagement and experience scores, then report top 10 satisfied customers."""
@@ -163,12 +166,6 @@ def compute_satisfaction_score(df):
 
 
 
-import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error, r2_score
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 def build_regression_model(df, features, target):
     """Build and evaluate a regression model to predict the satisfaction score."""

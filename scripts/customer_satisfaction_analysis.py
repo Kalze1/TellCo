@@ -3,6 +3,11 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics.pairwise import euclidean_distances
 from sklearn.cluster import KMeans
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 def assign_engagement_experience_scores(df, engagement_metrics, experience_metrics, k=3):
     """Assigns engagement and experience scores to each user."""
@@ -40,12 +45,7 @@ def assign_engagement_experience_scores(df, engagement_metrics, experience_metri
     
     return df[['MSISDN/Number', 'Engagement Score', 'Experience Score']]
 
-import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error, r2_score
-import matplotlib.pyplot as plt
-import seaborn as sns
+
 
 def build_regression_model(df, features, target):
     """Build and evaluate a regression model to predict the satisfaction score."""

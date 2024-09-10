@@ -11,7 +11,14 @@ from user_engagement import aggregate_engagement_metrics, aggregate_traffic_per_
 from eda_module import aggregate_user_data, bivariate_analysis, compute_basic_metrics, correlation_analysis, pca_analysis, segment_users_by_duration  
 
 # Load the data
-df = load_df()
+# df = load_df()
+
+
+csv_url = 'https://drive.google.com/file/d/1WKoMNNlQneudk5JY0JEvtRkCVYIUQYZK/view?usp=sharing'
+
+# Load the CSV file
+df = pd.read_csv(csv_url)
+
 df= df.head()
 
 

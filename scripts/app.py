@@ -7,7 +7,7 @@ from customer_satisfaction_analysis import compute_satisfaction_score
 from reserv import dispersion_parameters, display_user_engagement_metrics, visualize_app_traffic, visualize_basic_metrics, visualize_correlation, visualize_decile_data, visualize_elbow_method, visualize_handset_stats, visualize_kmeans_clusters, visualize_pca, visualize_regression_model, visualize_silhouette_score, visualize_top_3_apps
 import plotly.express as px 
 import plotly.graph_objects as go 
-from load_data import load_df  
+# from load_data import load_df  
 from eda_module import aggregate_user_data, bivariate_analysis, compute_basic_metrics,  segment_users_by_duration  
 
 # Load the data

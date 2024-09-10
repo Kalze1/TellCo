@@ -99,8 +99,34 @@ def univariate_analysis(df, variable):
     plt.title(f"Boxplot of {variable}")
     plt.show()
 
+
+
+
+
+def create_and_normalize_columns(df):
+    """Create and normalize session_count, total_duration, and total_traffic columns."""
+    
+    # Create the necessary columns
+    df['session_count'] = df.groupby('IMSI')['Bearer Id'].transform('count')
+    df['total_duration'] = df.groupby('IMSI')['Dur. (ms)'].transform('sum')
+    df['total_traffic'] = df.groupby('IMSI')['Total DL (Bytes)'].transform('sum') + df.groupby('IMSI')['Total UL (Bytes)'].transform('sum')
+    
+    # Normalize the newly created columns
+    scaler = StandardScaler()
+    normalized_data = scaler.fit_transform(df[['session_count', 'total_duration', 'total_traffic']])
+    normalized_df = pd.DataFrame(normalized_data, columns=['session_count', 'total_duration', 'total_traffic'])
+    
+    # Combine the normalized data back with the original DataFrame
+    df[['session_count', 'total_duration', 'total_traffic']] = normalized_df
+    
+    return df
+
+
+
+
 # Function to perform bivariate analysis
 def bivariate_analysis(df, app_columns):
+    df, decliced_data =segment_users_by_duration(df)
     for app in app_columns:
         plt.figure(figsize=(8, 5))
         sns.scatterplot(x=df[app], y=df['Total_Data'])
@@ -108,6 +134,8 @@ def bivariate_analysis(df, app_columns):
         plt.xlabel(app)
         plt.ylabel("Total Data (DL + UL)")
         plt.show()
+
+    return decliced_data
 
 # Function to compute correlation matrix
 def correlation_analysis(df, app_columns):

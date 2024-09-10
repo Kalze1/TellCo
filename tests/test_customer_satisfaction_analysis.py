@@ -1,6 +1,6 @@
 import pytest
 import pandas as pd
-from customer_satisfaction_analysis import (
+from scripts.customer_satisfaction_analysis import (
     build_regression_model,
     run_kmeans_on_scores,
     aggregate_scores_per_cluster,

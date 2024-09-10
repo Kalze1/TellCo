@@ -218,14 +218,31 @@ def display_cluster_stats(df):
 
 
 
-def bivariate_analysis(df, app_columns):
+def visualize_decliced_data(decliced_data):
+    
+    # Display the decliced_data DataFrame
+    st.write(decliced_data)
+    
+    # Visualize the distribution of Total Data
+    st.write("### Distribution of Total Data")
+    fig, ax = plt.subplots(figsize=(10, 6))
+    sns.histplot(decliced_data['Total_Data'], bins=20, kde=True, ax=ax)
+    ax.set_title('Distribution of Total Data')
+    ax.set_xlabel('Total Data (DL + UL)')
+    ax.set_ylabel('Frequency')
+    st.pyplot(fig)
+    
+    # Visualize the relationship between different applications and Total Data
+    app_columns = [col for col in decliced_data.columns if col not in ['Total_Data', 'IMSI']]
     for app in app_columns:
-        fig, ax = plt.subplots(figsize=(8, 5))
-        sns.scatterplot(x=df[app], y=df['Total_Data'], ax=ax)
-        ax.set_title(f"Relationship between {app} and Total Data")
+        st.write(f"### Relationship between {app} and Total Data")
+        fig, ax = plt.subplots(figsize=(10, 6))
+        sns.scatterplot(x=decliced_data[app], y=decliced_data['Total_Data'], ax=ax)
+        ax.set_title(f'Relationship between {app} and Total Data')
         ax.set_xlabel(app)
-        ax.set_ylabel("Total Data (DL + UL)")
+        ax.set_ylabel('Total Data (DL + UL)')
         st.pyplot(fig)
+
 
 
 
@@ -268,6 +285,7 @@ def visualize_top_3_apps(df):
 
 
 def visualize_elbow_method(df):
+    
     st.write("## Elbow Method for Optimal k")
     
     # Use the elbow method
@@ -608,9 +626,6 @@ def visualize_aggregated_scores(df):
 
 
 # # Streamlit app layout
-# st.title('Telco Data Analysis Dashboard')
-# st.header('Overview')
-# st.write('This dashboard presents the analysis of Telco user data.')
 
 # # # Display the entire dataset
 # st.subheader('Entire Dataset')
@@ -652,18 +667,18 @@ def visualize_aggregated_scores(df):
 
 
 
-# df, decile_data = segment_users_by_duration(df)
-# # Visualization: Total Data (DL+UL) per Decile Class
-# st.subheader('Total Data (DL+UL) per Decile Class')
-# visualize_decile_data(decile_data)
+df, decile_data = segment_users_by_duration(df)
+# Visualization: Total Data (DL+UL) per Decile Class
+st.subheader('Total Data (DL+UL) per Decile Class')
+visualize_decile_data(decile_data)
 
-# mean_values, median_values, std_dev, dispersion_params = compute_basic_metrics(df)
-# # Display the basic metrics
-# st.subheader('Basic Metrics')
-# # Visualization: Basic Metrics
-# visualize_basic_metrics(mean_values, median_values, std_dev, dispersion_params)
+mean_values, median_values, std_dev, dispersion_params = compute_basic_metrics(df)
+# Display the basic metrics
+st.subheader('Basic Metrics')
+# Visualization: Basic Metrics
+visualize_basic_metrics(mean_values, median_values, std_dev, dispersion_params)
 
-# dispersion_parameters()
+dispersion_parameters()
 
 
 

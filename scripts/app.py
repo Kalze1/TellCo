@@ -3,15 +3,15 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from customer_satisfaction_analysis import compute_satisfaction_score
-from reserv import dispersion_parameters, display_user_engagement_metrics, visualize_app_traffic, visualize_basic_metrics, visualize_correlation, visualize_decile_data, visualize_elbow_method, visualize_handset_stats, visualize_kmeans_clusters, visualize_pca, visualize_regression_model, visualize_silhouette_score, visualize_top_3_apps
+from reserv import dispersion_parameters, display_user_engagement_metrics, visualize_app_traffic, visualize_basic_metrics, visualize_correlation, visualize_decile_data, visualize_decliced_data, visualize_elbow_method, visualize_handset_stats, visualize_kmeans_clusters, visualize_pca, visualize_regression_model, visualize_silhouette_score, visualize_top_3_apps
 import plotly.express as px 
 import plotly.graph_objects as go 
 from load_data import load_df  
-from eda_module import aggregate_user_data, bivariate_analysis, compute_basic_metrics,  segment_users_by_duration  
+from eda_module import aggregate_user_data, bivariate_analysis, compute_basic_metrics, create_and_normalize_columns,  segment_users_by_duration  
 
 # Load the data
 df = load_df()
-df = df.head()
+# df = df.head()
 
 # Numeric columns
 numeric_columns = [
@@ -32,19 +32,19 @@ user_aggregates = aggregate_user_data(df)
 
 # Set Streamlit theme
 sns.set_theme(style="whitegrid")
-st.set_page_config(layout="wide")
+# st.set_page_config(layout="wide")
 
 # Create Sidebar
 
 
 st.sidebar.title("Select Analysis Type")
-selected_type = st.sidebar.selectbox("Choose Type ", ["User Overview Analysis","User engagement analysis", "Experience anysis", "Satisfaction analysis","Conclusion"])
+selected_type = st.sidebar.selectbox("Choose Type ", ["User Overview Analysis","User Engagement Analysis", "Experience anysis", "Satisfaction analysis","Conclusion"])
 
 if selected_type == "User Overview Analysis":
 
     st.sidebar.title("User Overview Analysis")
     selected_analysis = st.sidebar.selectbox("Choose Analysis", [
-        "Overview","Aggregated Data" "User Metrics", "Application Usage", "Decile Class"])
+        "Overview","Aggregated Data", "User Metrics", "Application Usage", "Decile Class"])
     st.title('Unleash the Potential of TellCo.')
 
     # Display the entire dataset (optional)
@@ -71,6 +71,7 @@ if selected_type == "User Overview Analysis":
     if selected_analysis == "Aggregated Data":
         st.subheader('Aggregated User Data')
         st.write(user_aggregates)
+        
 
 
 
@@ -114,9 +115,9 @@ if selected_type == "User Overview Analysis":
             st.plotly_chart(fig)
 
 
-# User engagement analysis/
+# User engagement analysis
 
-if selected_type == "User engagement analysis":
+if selected_type == "User Engagement Analysis":
 
     st.sidebar.title("User Engagement Analysis")
     selected_analysis = st.sidebar.selectbox("Choose Analysis", [
@@ -130,7 +131,8 @@ if selected_type == "User engagement analysis":
         app_columns = ['Social Media DL (Bytes)', 'Social Media UL (Bytes)', 'Google DL (Bytes)', 'Google UL (Bytes)', 
                'Youtube DL (Bytes)', 'Youtube UL (Bytes)', 'Netflix DL (Bytes)', 'Netflix UL (Bytes)', 
                'Gaming DL (Bytes)', 'Gaming UL (Bytes)', 'Other DL (Bytes)', 'Other UL (Bytes)']
-        bivariate_analysis(df, app_columns)
+        decliced_data = bivariate_analysis(df, app_columns)
+        visualize_decliced_data(decliced_data)
 
     # Visualize the correlation between app usage metrics
     if selected_analysis == "correlation between app":
@@ -176,11 +178,14 @@ if selected_type == "Experience anysis":
     # Visualize the elbow method (for KMeans clustering)
     if selected_analysis == "Elbow method":
         st.header('Elbow method')
+        df = create_and_normalize_columns(df)
         visualize_elbow_method(df)
 
     # Visualize the silhouette score for a chosen k
     if selected_analysis == "Silhouette score for a chosen k":
         st.header('Silhouette score for a chosen k')
+        df = create_and_normalize_columns(df)
+
         k = 3  # can change this value based on your analysis
         visualize_silhouette_score(df, k)
 
@@ -188,6 +193,8 @@ if selected_type == "Experience anysis":
     # Visualize the k-means clusters for user experience
     if selected_analysis == "k-means clusters for user experience":
         st.header('k-means clusters for user experience')
+        df = create_and_normalize_columns(df)
+
         visualize_kmeans_clusters(df, k=3)
 
     # Visualize the handset statistics

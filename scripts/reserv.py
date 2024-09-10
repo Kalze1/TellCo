@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from customer_satisfaction_analysis import aggregate_scores_per_cluster, assign_engagement_experience_scores, run_kmeans_on_scores
 from experiance_segmentation import aggregate_per_customer, analyze_throughput_tcp_retransmission, build_regression_model, compute_satisfaction_score, compute_top_bottom_frequent, perform_kmeans_clustering
 from user_engagement import aggregate_engagement_metrics, aggregate_traffic_per_app, compute_cluster_stats, elbow_method, normalize_and_cluster, plot_top_3_apps, silhouette_analysis
-from load_data import load_df  
+# from load_data import load_df  
 from eda_module import aggregate_user_data, bivariate_analysis, compute_basic_metrics, correlation_analysis, pca_analysis, segment_users_by_duration  
 
 # Load the data

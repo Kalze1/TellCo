@@ -17,7 +17,8 @@ from eda_module import aggregate_user_data, bivariate_analysis, compute_basic_me
 csv_url = 'https://drive.google.com/file/d/1WKoMNNlQneudk5JY0JEvtRkCVYIUQYZK/view?usp=sharing'
 
 # Load the CSV file
-df = pd.read_csv(csv_url)
+df = pd.read_csv(csv_url, encoding='utf-8')
+# df = pd.read_csv(csv_url)
 
 df= df.head()
 

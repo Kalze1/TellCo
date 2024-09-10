@@ -3,7 +3,7 @@ numpy
 matplotlib
 seaborn
 scipy
-psycopg2
+# psycopg2
 scikit-learn
 pytest
 mlflow
